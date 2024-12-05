@@ -11,8 +11,8 @@ pipeline {
         IMAGE_NAME = "labiolly37/bankapp"
         TAG = "${params.DOCKER_TAG}"  // The image tag now comes from the parameter
         KUBE_NAMESPACE = 'webapps'
-        SCANNER_HOME= tool 'sonar-scanner'
-    }i
+        SCANNER_HOME = tool 'sonar-scanner'
+    }
 
     stages {
         stage('Git Checkout') {
@@ -35,7 +35,7 @@ pipeline {
             }
         }
         
-        stage('Docker build') {
+        stage('Docker Build') {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred') {
@@ -64,7 +64,6 @@ pipeline {
         stage('Deploy MySQL Deployment and Service') {
             steps {
                 script {
-
                     withKubeConfig(caCertificate: '', clusterName: 'bluegreendeploy-cluster', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://8567D5DC9B9E15F1B5E78E687F5ABF58.gr7.us-east-1.eks.amazonaws.com') {
                         sh "kubectl apply -f mysql-ds.yml -n ${KUBE_NAMESPACE}"  // Ensure you have the MySQL deployment YAML ready
                     }
@@ -80,7 +79,7 @@ pipeline {
                                 kubectl apply -f bankapp-service.yml -n ${KUBE_NAMESPACE}
                               fi
                         """
-                   }
+                    }
                 }
             }
         }
@@ -136,3 +135,4 @@ pipeline {
         }
     }
 }
+
