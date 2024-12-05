@@ -2,12 +2,13 @@ pipeline {
     agent any
     tools {
         git '/usr/bin/git'
+    }
     parameters {
         choice(name: 'DEPLOY_ENV', choices: ['blue', 'green'], description: 'Choose which environment to deploy: Blue or Green')
         choice(name: 'DOCKER_TAG', choices: ['blue', 'green'], description: 'Choose the Docker image tag for the deployment')
         booleanParam(name: 'SWITCH_TRAFFIC', defaultValue: false, description: 'Switch traffic between Blue and Green')
     }
-    
+
     environment {
         IMAGE_NAME = "labiolly37/bankapp"
         TAG = "${params.DOCKER_TAG}"  // The image tag now comes from the parameter
@@ -21,7 +22,7 @@ pipeline {
                 git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/labiolly37/blue-green-project.git'
             }
         }
-        
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar') {
@@ -29,13 +30,13 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Trivy FS Scan') {
             steps {
                 sh "trivy fs --format table -o fs.html ."
             }
         }
-        
+
         stage('Docker Build') {
             steps {
                 script {
@@ -45,13 +46,13 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Trivy Image Scan') {
             steps {
                 sh "trivy image --format table -o image.html ${IMAGE_NAME}:${TAG}"
             }
         }
-        
+
         stage('Docker Push Image') {
             steps {
                 script {
@@ -61,7 +62,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy MySQL Deployment and Service') {
             steps {
                 script {
@@ -71,7 +72,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy SVC-APP') {
             steps {
                 script {
@@ -84,7 +85,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy to Kubernetes') {
             steps {
                 script {
@@ -101,7 +102,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Switch Traffic Between Blue & Green Environment') {
             when {
                 expression { return params.SWITCH_TRAFFIC }
@@ -120,7 +121,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Verify Deployment') {
             steps {
                 script {
@@ -136,4 +137,3 @@ pipeline {
         }
     }
 }
-
