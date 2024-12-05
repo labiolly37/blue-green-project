@@ -1,0 +1,36 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: app-role
+  namespace: webapps  # This role applies to the 'webapps' namespace
+rules:
+  - apiGroups:
+      - ""                     # The core API group (pods, services, etc.)
+      - apps                   # Apps API group (deployments, daemonsets, etc.)
+      - autoscaling            # Autoscaling API group (horizontalpodautoscalers)
+      - batch                  # Batch API group (jobs, cronjobs)
+      - extensions             # Extensions API group (ingress, etc.)
+      - policy                 # Policy API group (podsecuritypolicies, etc.)
+      - rbac.authorization.k8s.io  # RBAC API group (roles, rolebindings)
+    resources:
+      - pods                   # Pod-related resources
+      - componentstatuses       # Component status
+      - configmaps              # ConfigMap resources
+      - daemonsets              # DaemonSets
+      - deployments             # Deployments
+      - events                  # Events
+      - endpoints               # Endpoints
+      - horizontalpodautoscalers  # Horizontal Pod Autoscalers
+      - ingress                 # Ingress resources
+      - jobs                    # Batch jobs
+      - limitranges             # Limit ranges for resources
+      - namespaces              # Namespaces (though this is a namespace-scoped role)
+      - nodes                   # Nodes
+      - persistentvolumes        # Persistent volumes
+      - persistentvolumeclaims   # Persistent volume claims
+      - resourcequotas           # Resource quotas in namespaces
+      - replicasets             # Replica sets
+      - replicationcontrollers   # Replication controllers
+      - serviceaccounts          # Service accounts
+      - services                # Services
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]  # Allowed actions
